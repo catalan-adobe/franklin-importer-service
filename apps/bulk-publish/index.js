@@ -74,7 +74,7 @@ const { hideBin } = require('yargs/helpers');
 
   // Start the workers
   for (let i = 0; i < numWorkers; i++) {
-    const worker = new Worker('./worker.js');
+    const worker = new Worker(__dirname + '/worker.js');
     workers.push(worker);
     // Handle worker exit
     worker.on('exit', workerExitHandler.bind(null, workers));
