@@ -11,20 +11,18 @@ const { hideBin } = require('yargs/helpers');
 
 (async function main() {
   const argv = yargs(hideBin(process.argv))
-    .usage('Usage: $0 --file urlFile [--stage <stage>] [--workers <number>]')
-    .conflicts('f', 'i')
+    .usage('Usage: $0 [-i] [--file urlFile] [--stage <stage>] [--workers <number>]')
     .option('interactive', {
       alias: 'i',
       describe: 'Start the application in interactive mode, you will be prompted to give the list of URLs directly in the application. Enter an empty line to finish the process',
-      // demandOption: true,
       type: 'boolean',
     })
     .option('file', {
       alias: 'f',
       describe: 'Path to a text file containing a list of URLs (urls pattern: "https://<branch>--<repo>--<owner>.hlx.page/<path>")',
-      // demandOption: true,
       type: 'string',
     })
+    .conflicts('f', 'i')
     .option('stage', {
       alias: 's',
       describe: 'The stage the content will be publised to',
