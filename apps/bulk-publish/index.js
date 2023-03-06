@@ -68,9 +68,7 @@ const { hideBin } = require('yargs/helpers');
 
   const numWorkers = argv.workers;
 
-  console.log(`Starting ${numWorkers} worker${numWorkers > 1 ? 's' : ''}...`);
-
-  terminal.green(`Processing ${urls.length} urls with ${numWorkers} workers...\n`);
+  terminal.green(`Processing ${urls.length} url(s) with ${numWorkers} worker(s)...\n`);
 
   // Start the workers
   for (let i = 0; i < numWorkers; i++) {
