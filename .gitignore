@@ -105,3 +105,6 @@ dist
 
 # Project Specific
 build
+
+# Misc
+.DS_Store
