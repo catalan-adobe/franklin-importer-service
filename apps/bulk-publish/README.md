@@ -2,13 +2,13 @@ Franklin Bulk Publish CLI
 ===
 
 ```
-npx https://gitpkg.now.sh/catalan-adobe/franklin-importer-service/apps/bulk-publish?main
+npx franklin-bulk-publish
 ```
 
 ### Usage
 
 ```
-Usage: index.js [-i] [--file urlFile] [--stage <stage>] [--workers <number>]
+Usage: franklin-bulk-publish [-i] [--file urlFile] [--stage <stage>] [--workers <number>]
 
 Options:
       --help         Show help                                         [boolean]
@@ -24,4 +24,19 @@ Options:
   -s, --stage        The stage the content will be publised to
                                [choices: "preview", "live"] [default: "preview"]
   -w, --workers      Number of workers to use              [number] [default: 1]
+```
+
+
+### Local Development
+
+#### Install
+
+```
+npm install
+```
+
+#### Run
+
+```
+node index.js
 ```
