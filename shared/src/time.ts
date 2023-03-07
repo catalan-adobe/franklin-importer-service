@@ -10,81 +10,31 @@
  * governing permissions and limitations under the License.
  */
 
-import parse from 'parse-duration';
-
-/*
- * Types
- */
-
-/**
- * @typedef {number | string} Duration - Duration type accepts a number or a string
- * - number - milliseconds
- * - string - will be parsed into milliseconds (ex. '5s' => 5000)
- */
-export type Duration = number | string;
-
 /*
  * Functions
  */
 
 /**
  * Waits the given time
- * @param {Duration} [time=1000] - The duration to wait
- * - number - milliseconds
- * - string - will be parsed into milliseconds (ex. '5s' => 5000)
+ * @param {number} [time=1000] - The duration to wait, in milliseconds
  * @returns {Promise<void>} null or an error in case the duration could not get parsed
  */
-export function sleep(time: Duration = 1000): Promise<void> {
-  let d: number;
-  if (typeof time === 'string') {
-    d = parse(time);
-  } else {
-    d = time;
-  }
-  if (d === null) {
-    return Promise.reject(new Error(`cannot parse duration parameter "${time}"`));
-  }
-
+export function sleep(time: number = 1000): Promise<void> {
   return new Promise((resolve) => {
-    setTimeout(resolve, d);
+    setTimeout(resolve, time);
   });
 }
 
 /**
  * Waits a random time between a given range
- * @param {Duration} [minDuration=1000] - The minimum duration to wait
- * - number - milliseconds
- * - string - will be parsed into milliseconds (ex. '5s' => 5000)
- * @param {Duration} [maxDuration=2000] - The maximum duration to wait
- * - number - milliseconds
- * - string - will be parsed into milliseconds (ex. '5s' => 5000)
+ * @param {Duration} [min=1000] - The minimum duration to wait, in milliseconds
+ * @param {Duration} [max=2000] - The maximum duration to wait, in milliseconds
  * @returns {Promise<void>} null or an error in case a duration could not get parsed
  */
 export function randomSleep(
-  minDuration: Duration = 1000,
-  maxDuration: Duration = 2000,
+  min: number = 1000,
+  max: number = 2000,
 ): Promise<void> {
-  let min: number;
-  let max: number;
-
-  if (typeof minDuration === 'string') {
-    min = parse(minDuration);
-  } else {
-    min = minDuration;
-  }
-  if (min === null) {
-    return Promise.reject(new Error(`cannot parse min duration parameter "${minDuration}"`));
-  }
-
-  if (typeof maxDuration === 'string') {
-    max = parse(maxDuration);
-  } else {
-    max = maxDuration;
-  }
-  if (max === null) {
-    return Promise.reject(new Error(`cannot parse max duration parameter "${maxDuration}"`));
-  }
-
   if ((min === 0 && max === 0) || max < min) {
     return Promise.reject(new Error('min/max range not supported (min > 0 AND max > 0 AND AND min < max)'));
   }
