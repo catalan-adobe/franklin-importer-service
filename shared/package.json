@@ -31,7 +31,7 @@
   },
   "homepage": "https://github.com/catalan-adobe/franklin-importer-service#readme",
   "dependencies": {
-    "@types/node": "16.x",
+    "@types/node": "18.x",
     "chromium": "3.0.3",
     "puppeteer-core": "19.7.3",
     "parse-duration": "1.0.3"
