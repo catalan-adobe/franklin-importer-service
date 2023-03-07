@@ -96,7 +96,7 @@ async function readLines() {
       default: 1,
       coerce: (value) => {
         if (value > 5) {
-          terminal.yellow('Warning: Maximum number of workers is 5. Using 5 workers instead.');
+          terminal.yellow('Warning: Maximum number of workers is 5. Using 5 workers instead.\n');
           return 5;
         }
         return value;
@@ -112,7 +112,7 @@ async function readLines() {
     urls = fs.readFileSync(argv.file, 'utf-8').split('\n').filter(Boolean);
   } else {
     yargs.showHelp('log');
-    terminal.yellow('Please specify either a file or interactive mode');
+    terminal.yellow('Please specify either a file or interactive mode\n');
     process.exit(1);
   }
 
