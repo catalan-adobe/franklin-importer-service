@@ -14,7 +14,7 @@ const { hideBin } = require('yargs/helpers');
     .usage('Usage: $0 [-i] [--file urlFile] [--stage <stage>] [--workers <number>]')
     .option('interactive', {
       alias: 'i',
-      describe: 'Start the application in interactive mode, you will be prompted to give the list of URLs directly in the application. Enter an empty line to finish the process',
+      describe: 'Start the application in interactive mode, you will be prompted to copy/paste the list of URLs directly in the terminal. Enter an empty line to finish the process',
       type: 'boolean',
     })
     .option('file', {
