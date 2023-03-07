@@ -1,6 +1,6 @@
 {
   "name": "bulk-publish",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "A CLI tool for publishing documents in Franklin",
   "bin": "index.js",
   "dependencies": {
