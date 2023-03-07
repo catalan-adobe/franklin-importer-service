@@ -34,7 +34,7 @@
     "@types/node": "16.x",
     "chromium": "3.0.3",
     "puppeteer-core": "19.7.3",
-    "parse-duration": "1.0.2"
+    "parse-duration": "1.0.3"
   },
   "devDependencies": {
     "@adobe/eslint-config-helix": "^2.0.2",
