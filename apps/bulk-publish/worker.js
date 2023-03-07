@@ -1,10 +1,20 @@
 const { parentPort } = require('worker_threads');
 const axios = require('axios');
 
-const FRANKLIN_API_HOST = "https://admin.hlx.page";
+const FRANKLIN_API_HOST = 'https://admin.hlx.page';
 
-// variables for this worker instance
+// global variables for this worker instance
 let franklinStage = null;
+
+/*
+ * Helper Functions
+ */
+
+function buildAPIURL(stage, url) {
+  const u = new URL(url);
+  const [branch, repo, org] = u.host.split('.')[0].split('--');
+  return [FRANKLIN_API_HOST, stage, org, repo, branch].join('/') + u.pathname;
+}
 
 /*
  * Worker thread
@@ -28,9 +38,9 @@ parentPort.on('message', async (msg) => {
       parentPort.postMessage({
         url: msg.url,
         passed: true,
-        result: `Success: ${response.status}`
+        result: `Success: ${response.status}`,
       });
-    } catch(error) {
+    } catch (error) {
       parentPort.postMessage({
         url: msg.url,
         passed: false,
@@ -39,13 +49,3 @@ parentPort.on('message', async (msg) => {
     }
   }
 });
-
-/*
- * Helper Functions
- */
-
-function buildAPIURL(stage, url) {
-  const u = new URL(url);
-  const [branch, repo, org] = u.host.split('.')[0].split('--');
-  return [FRANKLIN_API_HOST, stage, org, repo, branch].join('/') + u.pathname;
-}
