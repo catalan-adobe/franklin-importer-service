@@ -1,11 +1,16 @@
 #!/usr/bin/env node
 
+// imports
 const fs = require('fs');
 const readline = require('readline');
 const yargs = require('yargs');
 const { hideBin } = require('yargs/helpers');
 const { terminal } = require('terminal-kit');
 const { Worker } = require('worker_threads');
+
+// constants
+const FRANKLIN_STAGE_PREVIEW = 'preview';
+const FRANKLIN_STAGE_LIVE = 'live';
 
 /*
  * Worker handlers
@@ -41,6 +46,34 @@ function workerExitHandler(workers) {
  * Helper functions
  */
 
+function publishOptions() {
+  return yargs
+    .option('interactive', {
+      alias: 'i',
+      describe: 'Start the application in interactive mode, you will be prompted to copy/paste the list of URLs directly in the terminal. Enter an empty line to finish the process',
+      type: 'boolean',
+    })
+    .option('file', {
+      alias: 'f',
+      describe: 'Path to a text file containing the list of URLs to deliver (urls pattern: "https://<branch>--<repo>--<owner>.hlx.page/<path>")',
+      type: 'string',
+    })
+    .conflicts('f', 'i')
+    .option('workers', {
+      alias: 'w',
+      describe: 'Number of workers to use (max. 5)',
+      type: 'number',
+      default: 1,
+      coerce: (value) => {
+        if (value > 5) {
+          terminal.yellow('Warning: Maximum number of workers is 5. Using 5 workers instead.\n');
+          return 5;
+        }
+        return value;
+      },
+    });
+}
+
 async function readLines() {
   const rl = readline.createInterface({
     input: process.stdin,
@@ -69,42 +102,18 @@ async function readLines() {
  */
 
 (async function main() {
-  // CLI parameters
-  const { argv } = yargs(hideBin(process.argv))
-    .usage('Usage: $0 [-i] [--file urlFile] [--stage <stage>] [--workers <number>]')
-    .option('interactive', {
-      alias: 'i',
-      describe: 'Start the application in interactive mode, you will be prompted to copy/paste the list of URLs directly in the terminal. Enter an empty line to finish the process',
-      type: 'boolean',
-    })
-    .option('file', {
-      alias: 'f',
-      describe: 'Path to a text file containing a list of URLs (urls pattern: "https://<branch>--<repo>--<owner>.hlx.page/<path>")',
-      type: 'string',
-    })
-    .conflicts('f', 'i')
-    .option('stage', {
-      alias: 's',
-      describe: 'The stage the content will be publised to',
-      choices: ['preview', 'live'],
-      default: 'preview',
-    })
-    .option('workers', {
-      alias: 'w',
-      describe: 'Number of workers to use',
-      type: 'number',
-      default: 1,
-      coerce: (value) => {
-        if (value > 5) {
-          terminal.yellow('Warning: Maximum number of workers is 5. Using 5 workers instead.\n');
-          return 5;
-        }
-        return value;
-      },
-    });
-
   let urls = [];
 
+  // CLI parameters
+  const { argv } = yargs(hideBin(process.argv))
+    .command(FRANKLIN_STAGE_PREVIEW, 'Preview documents in Franklin', publishOptions)
+    .command(FRANKLIN_STAGE_LIVE, 'Publish documents in Franklin', publishOptions)
+    .help('h');
+
+  // set delivery stage
+  const stage = argv._[0];
+
+  // parse URLs
   if (argv.interactive) {
     urls = await readLines();
   } else if (argv.file) {
@@ -145,7 +154,7 @@ async function readLines() {
       results.push({ url, status: null });
       workers[i].postMessage({
         idx: i + 1,
-        stage: argv.stage,
+        stage,
         line: urls.length - urls.length,
         url,
       });
