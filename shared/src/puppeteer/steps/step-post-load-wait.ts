@@ -9,7 +9,28 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+import { sleep } from '../../time.js';
 
-export * as Puppeteer from './src/puppeteer/puppeteer.js';
-export * as Time from './src/time.js';
-export * as Url from './src/url.js';
+export function postLoadWait(ms) {
+  return function(action) {
+    return async (params) => {
+      try {
+        console.info('do post load wait');
+  
+        // main action
+        await action(params);
+  
+        await sleep(ms);
+      } catch(e) {
+        console.error('post load wait catch', e);
+        params.result = {
+          passed: false,
+          error: e,
+        };
+      } finally {
+        console.info('post load wait finally');
+        return params;
+      }
+    };
+  };
+}

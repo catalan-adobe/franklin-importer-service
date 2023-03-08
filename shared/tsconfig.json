@@ -1,12 +1,15 @@
 {
   "compilerOptions": {
     "module": "NodeNext",
-    "target": "es6",
+    "target": "es2021",
     "outDir": "dist",
     "rootDir": ".",
     "sourceMap": true,
     "strict": false,
-    "declaration": true
+    "declaration": true,
+    "types": [
+      "node",
+    ],
   },
   // NEW: Options for file/directory watching
   "watchOptions": {
