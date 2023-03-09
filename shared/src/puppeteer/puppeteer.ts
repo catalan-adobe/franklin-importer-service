@@ -27,7 +27,7 @@ export type BrowserOptions = {
  * Functions
  */
 
-export async function initBrowser(options: BrowserOptions): Promise<[puppeteer.Browser, puppeteer.Page]> {
+export async function initBrowser(options?: BrowserOptions): Promise<[puppeteer.Browser, puppeteer.Page]> {
   // defaults
   const headless = options?.headless !== false;
   const width = options?.width || 1200;
