@@ -26,7 +26,9 @@ await importerLib.Puppeteer.runStepsSequence(page, testUrl,
   [
     importerLib.Puppeteer.Steps.postLoadWait(2000),
     importerLib.Puppeteer.Steps.smartScroll,
-    importerLib.Puppeteer.Steps.franklinImportPage(process.cwd()+'/helpx-internal/import.js'),
+    importerLib.Puppeteer.Steps.franklinImportPage({
+      importerSrcFolder: process.cwd()+'/helpx-internal/import.js'
+    }),
   ]);
 
 // cool down

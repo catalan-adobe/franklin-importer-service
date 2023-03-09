@@ -166,7 +166,13 @@ const makeProxySrcs = async function(main, host, port) {
   return;
 };
 
-export function franklinImportPage(importerSrcFolder) {
+type FranklinImportStepOptions = {
+  importerSrcFolder: string;
+  outputFolder?: string;
+  saveMD?: boolean;
+};
+
+export function franklinImportPage({ importerSrcFolder, outputFolder = process.cwd() + 'import', saveMD = false}: FranklinImportStepOptions) {
   return function(action) {
     return async (params) => {
       try {
