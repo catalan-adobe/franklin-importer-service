@@ -1,7 +1,7 @@
 {
-  "name": "franklin-bulk-publish",
+  "name": "franklin-bulk",
   "version": "0.1.0",
-  "description": "A CLI tool for bulk publishing documents in Franklin",
+  "description": "A CLI tool for bulk operations on Franklin",
   "bin": "index.js",
   "scripts": {
     "lint": "eslint .",
