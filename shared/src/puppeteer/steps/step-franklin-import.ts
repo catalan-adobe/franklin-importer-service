@@ -273,14 +273,6 @@ export function franklinImportPage(importerSrcFolder) {
         fs.writeFileSync(pUtils.join(pageLocalFolder, filename), docs.docx);
       
         params.logger.info(docs.md);
-    
-        // const connStr = process.env.AzureWebJobsStorage;
-        // const hivesContainer = process.env.HivesContainerName;
-        // const blobServiceClient = BlobServiceClient.fromConnectionString(connStr);
-        // const containerClient = blobServiceClient.getContainerClient(hivesContainer);
-        // const blockBlobClient = await containerClient.getBlockBlobClient(pUtils.join(pageLocalFolder, filename));
-        // const uploadBlobResponse = await blockBlobClient.uploadFile(pUtils.join(pageLocalFolder, filename));
-        // params.logger.info(`Uploaded block blob ${pUtils.join(pageLocalFolder, filename)} successfully`, uploadBlobResponse.requestId);
         
         params.logger.info('stop franklin import page');
       } catch(e) {
