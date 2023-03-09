@@ -10,66 +10,82 @@
  * governing permissions and limitations under the License.
  */
 import { getMostBottomElement } from '../dom-snapshot.js';
+import { sleep } from '../../time.js';
 
-export function smartScroll(action) {
-  return async (params) => {
-    try {
-      params.logger.info('start smart scroll');
+type SmartScrollStepOptions = {
+  postReset?: boolean;
+};
 
-      const client = await params.page.target().createCDPSession();
-      await client.send('DOMSnapshot.enable');
+export function smartScroll({ postReset = true }: SmartScrollStepOptions = {}) {
+  return function(action) {
+    return async (params) => {
+      try {
+        params.logger.info('start smart scroll');
   
-      params.logger.info('DOMSnapshot.enable');
-  
-      const newParams = await action(params);
-      if (newParams.result && !newParams.result.passed) {
-        params.logger.warn(`smart scroll - previous action failed, do not continue!`)
-        return newParams;
-      }
-  
-      const response = await client.send('DOMSnapshot.captureSnapshot', {
-        computedStyles: ['top', 'bottom', 'x', 'y'],
-        includeDOMRects: true,
-        includeTextColorOpacities: true,
-        includePaintOrder: true,
-        includeBlendedBackgroundColors: true,
-      });
-  
-      const mostBottomNode = getMostBottomElement(response);
-  
-      /*
-        scroll
-      */
-  
-      let scrollOffset = mostBottomNode.rect.y;
-      while (scrollOffset > -500) {
-        /* eslint no-await-in-loop: "off" */
-        await params.page.waitForTimeout(50);
-        await client.send('DOM.scrollIntoViewIfNeeded', {
-          backendNodeId: mostBottomNode.backendNodeId,
-          rect: {
-            x: mostBottomNode.rect.x,
-            y: -1 * scrollOffset,
-            width: 0,
-            height: 0,
-          },
+        const client = await params.page.target().createCDPSession();
+        await client.send('DOMSnapshot.enable');
+    
+        params.logger.info('DOMSnapshot.enable');
+    
+        const newParams = await action(params);
+        if (newParams.result && !newParams.result.passed) {
+          params.logger.warn(`smart scroll - previous action failed, do not continue!`)
+          return newParams;
+        }
+    
+        const response = await client.send('DOMSnapshot.captureSnapshot', {
+          computedStyles: ['top', 'bottom', 'x', 'y'],
+          includeDOMRects: true,
+          includeTextColorOpacities: true,
+          includePaintOrder: true,
+          includeBlendedBackgroundColors: true,
         });
-  
-        scrollOffset -= 500;
+    
+        const mostBottomNode = getMostBottomElement(response);
+    
+        /*
+          scroll
+        */
+    
+        let scrollOffset = mostBottomNode.rect.y;
+        while (scrollOffset > -500) {
+          /* eslint no-await-in-loop: "off" */
+          await params.page.waitForTimeout(50);
+          await client.send('DOM.scrollIntoViewIfNeeded', {
+            backendNodeId: mostBottomNode.backendNodeId,
+            rect: {
+              x: mostBottomNode.rect.x,
+              y: -1 * scrollOffset,
+              width: 0,
+              height: 0,
+            },
+          });
+    
+          scrollOffset -= 500;
+        }
+    
+        await sleep(250);
+
+        if (postReset) {
+          await params.page.evaluate(() => {
+            window.scrollTo(0, 0);
+          });
+          await sleep(1000);
+        }
+
+        await client.send('DOMSnapshot.disable');
+    
+        params.logger.info('stop smart scroll');  
+      } catch(e) {
+        params.logger.error('smart scroll catch', e);
+        params.result = {
+          passed: false,
+          error: e,
+        };
+      } finally {
+        params.logger.info('smart scroll finally');
+        return params;
       }
-  
-      await client.send('DOMSnapshot.disable');
-  
-      params.logger.info('stop smart scroll');  
-    } catch(e) {
-      params.logger.error('smart scroll catch', e);
-      params.result = {
-        passed: false,
-        error: e,
-      };
-    } finally {
-      params.logger.info('smart scroll finally');
-      return params;
-    }
-  };
+    };
+  }
 }
