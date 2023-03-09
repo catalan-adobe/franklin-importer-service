@@ -10,8 +10,6 @@
  * governing permissions and limitations under the License.
  */
 
-// import { buildFilenameWithPathFromUrl } from '../utils.mjs';
-
 import pUtils from 'path';
 import * as fs from 'fs';
 import http from 'http';
@@ -21,20 +19,16 @@ import { AddressInfo } from 'net'
 import finalhandler from 'finalhandler';
 import serveStatic from'serve-static';
 import sharp from 'sharp';
-// import prettier from 'prettier';
 import { JSDOM } from 'jsdom';
-// import { BlobServiceClient } from '@azure/storage-blob';
 import { buildPathAndFilenameWithPathFromUrl } from '../../url.js';
 
-// Franklin import
+// Franklin import globals
 import {
   DOMUtils,
   FileUtils,
   Blocks,
   html2docx,
 } from '@adobe/helix-importer';
-// import importer from '../../franklin/import/importer/helpx-internal/import.js';
-// import importer from '../../franklin/import/golfdigest.com/import.js';
 
 
 
@@ -60,27 +54,21 @@ const options = {
   setBackgroundImagesFromCSS: false,
   // docxStylesXML,
   image2png: async ({ src, data, type }) => {
-    // console.log(src, data, type);
     src = decodeURIComponent(src);
 
     let u = new URL(src);
     let imagePath = pUtils.join(mainParams.outputFolder, u.pathname);
-    // console.log(imagePath);
 
     const img = sharp(imagePath);
     const metadata = await img.metadata();
-
-    // console.log(metadata);
 
     const width = metadata.width;
     const height = metadata.height;
 
     const bufData = await img
-      // .raw()
       .toFormat('png')
-      .toBuffer(/*{ resolveWithObject: true }*/);
+      .toBuffer();
 
-    // console.log('info', info);
     console.log('converted', type, 'to png', src, width, height/*, info.size*/);
 
     return {
@@ -89,44 +77,6 @@ const options = {
       height,
       type: 'image/png',
     };
-
-    // const img = new Image();
-    // const blob = new Blob([data], { type });
-    // img.src = URL.createObjectURL(blob);
-    // img.crossOrigin = 'anonymous';
-    // await img.decode();
-
-    // let width = img.naturalWidth;
-    // let height = img.naturalHeight;
-
-    // // for some svgs, the natural width / height are not correctly computed
-    // if (type === 'image/svg+xml') {
-    //   const parser = new DOMParser();
-    //   const svg = data.toString('utf-8');
-    //   const svgDoc = parser.parseFromString(svg, 'text/html');
-    //   const svgTag = svgDoc.querySelector('svg');
-    //   const viewBox = svgTag?.getAttribute('viewBox');
-    //   if (viewBox) {
-    //     const [, , w, h] = viewBox.split(' ').map(Number);
-    //     if (w > img.naturalWidth || h > img.naturalHeight) {
-    //       width = w;
-    //       height = h;
-    //     }
-    //   }
-    // }
-
-    // // note: OffscreenCanvas is not supported on safari
-    // const canvas = new OffscreenCanvas(width, height);
-    // const ctx = canvas.getContext('2d');
-    // ctx.drawImage(img, 0, 0);
-    // const newBlob = await canvas.convertToBlob();
-    // console.log('converted', type, 'to png', src, width, height, blob.size);
-    // return {
-    //   data: newBlob.arrayBuffer(),
-    //   width,
-    //   height,
-    //   type: 'image/png',
-    // };
   },
 };
 
@@ -177,7 +127,7 @@ export function franklinImportPage({ importerSrcFolder, outputFolder = process.c
     return async (params) => {
       try {
         /*
-          before main action
+          before main browser step
         */
   
         mainParams = params;
@@ -191,14 +141,8 @@ export function franklinImportPage({ importerSrcFolder, outputFolder = process.c
           fs.mkdirSync(pageLocalFolder, { recursive: true });
         }
       
-        // params.logger.info(params.url);
-        // params.logger.info(params.outputFolder);
-        // params.logger.info(path);
-        // params.logger.info(filename);
-        // params.logger.info(pageLocalFolder);
-      
         /*
-          main action
+          main browser step
         */
     
         const newParams = await action(params);
@@ -208,7 +152,7 @@ export function franklinImportPage({ importerSrcFolder, outputFolder = process.c
         }
     
         /*
-          after main action
+          after main browser step
         */
     
         // start webserver to serve cached resources
@@ -227,14 +171,13 @@ export function franklinImportPage({ importerSrcFolder, outputFolder = process.c
   
   
         params.logger.info("get page content");
+        
+        /*
+         * franklin import
+         */
   
-        // import page
         // get fully rendered dom
         let content = await params.page.content();
-    
-        /*
-          helix import
-        */
   
         params.logger.info("new JSDOM");
   
@@ -247,24 +190,13 @@ export function franklinImportPage({ importerSrcFolder, outputFolder = process.c
         await makeProxySrcs(dom.window.document, u.origin, port);
   
         params.logger.info("Transforming DOM");
-  
-        // let tDom = importer.transformDOM({
-        //   document: dom.window.document,
-        //   url: null,
-        //   html: null,
-        //   params: null,
-        // });
     
         console.log(dom.window.document);
       
         params.logger.info("Transformed DOM");
-  
-        // const resultHtml = tDom.innerHTML; //.serialize();
-        // const formattedHtml = prettier.format(resultHtml, { parser: "html" });
-        // // params.logger.info(formattedHtml)
       
         params.logger.info("html2docx");
-        // const docs = await html2docx(params.url, tDom.innerHTML, {}, options);
+
         const importer = await import(importerSrcFolder);
         params.logger.info(importer.default);
 
@@ -273,8 +205,6 @@ export function franklinImportPage({ importerSrcFolder, outputFolder = process.c
         params.logger.info("Stop proxy server");
   
         server.close();
-  
-        // params.logger.info(docs.md);
       
         fs.writeFileSync(pUtils.join(pageLocalFolder, filename), docs.docx);
       
@@ -291,17 +221,14 @@ export function franklinImportPage({ importerSrcFolder, outputFolder = process.c
         params.logger.info('franklin import page finally');
         return params;
       }
-  
     };
   }
 }
 
 async function downloadIfNotCachedYet(url, cacheFolder) {
-  console.log('downloadIfNotCachedYet');
   const imgPath = pUtils.join(cacheFolder, url.pathname);
   console.log('downloadIfNotCachedYet', imgPath);
 
-  // const p = pUtils.parse(imgPath).dir;
   if (!fs.existsSync(pUtils.dirname(imgPath))){
     fs.mkdirSync(pUtils.dirname(imgPath), { recursive: true });
   }
@@ -313,7 +240,6 @@ async function downloadIfNotCachedYet(url, cacheFolder) {
     const response = await fetch(url.href);
     const blob = await response.blob();
     const arrayBuffer = await blob.arrayBuffer();
-    console.log('Buffer.from');
     const buffer = Buffer.from(arrayBuffer);
     await fs.writeFileSync(imgPath, buffer);
   }
