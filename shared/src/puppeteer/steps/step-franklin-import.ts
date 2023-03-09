@@ -22,7 +22,7 @@ import sharp from 'sharp';
 import { JSDOM } from 'jsdom';
 import { buildPathAndFilenameWithPathFromUrl } from '../../url.js';
 
-// Franklin import globals
+// Franklin import
 import {
   DOMUtils,
   FileUtils,
@@ -33,8 +33,8 @@ import {
 
 
 /*
- * Mimic helix-importer-ui global object WebImporter to enable
- * re-use import scripts without modification
+ * Mimic helix-importer-ui global object WebImporter to be able
+ * to re-use existing import scripts without modification
  */
 global.WebImporter = {
   Blocks,
