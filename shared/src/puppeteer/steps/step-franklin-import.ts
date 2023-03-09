@@ -28,6 +28,7 @@ import {
   FileUtils,
   Blocks,
   html2docx,
+  Loader,
 } from '@adobe/helix-importer';
 
 
@@ -39,6 +40,8 @@ import {
 global.WebImporter = {
   Blocks,
   DOMUtils,
+  FileUtils,
+  Loader,
 };
 
 
