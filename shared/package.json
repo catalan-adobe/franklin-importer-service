@@ -33,6 +33,7 @@
   "homepage": "https://github.com/catalan-adobe/franklin-importer-service#readme",
   "dependencies": {
     "@adobe/helix-importer": "2.8.3",
+    "@cliqz/adblocker-puppeteer": "^1.26.2",
     "chromium": "3.0.3",
     "finalhandler": "^1.2.0",
     "jsdom": "^21.1.0",
