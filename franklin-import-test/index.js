@@ -24,15 +24,16 @@ const [browser, page] = await importerLib.Puppeteer.initBrowser();
 
 await importerLib.Puppeteer.runStepsSequence(page, testUrl, 
   [
-    importerLib.Puppeteer.Steps.postLoadWait(2000),
+    importerLib.Puppeteer.Steps.postLoadWait(500),
     importerLib.Puppeteer.Steps.smartScroll,
     importerLib.Puppeteer.Steps.franklinImportPage({
-      importerSrcFolder: process.cwd()+'/helpx-internal/import.js'
+      importerSrcFolder: process.cwd()+'/helpx-internal/import.js',
+      saveMD: true,
     }),
   ]);
 
 // cool down
-await importerLib.Time.sleep(2000);
+await importerLib.Time.sleep(1000);
 
 await browser.close();
 

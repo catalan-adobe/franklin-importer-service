@@ -125,7 +125,7 @@ type FranklinImportStepOptions = {
   saveMD?: boolean;
 };
 
-export function franklinImportPage({ importerSrcFolder, outputFolder = process.cwd() + 'import', saveMD = false}: FranklinImportStepOptions) {
+export function franklinImportPage({ importerSrcFolder, outputFolder = process.cwd() + '/import', saveMD = false}: FranklinImportStepOptions) {
   return function(action) {
     return async (params) => {
       try {
@@ -134,14 +134,15 @@ export function franklinImportPage({ importerSrcFolder, outputFolder = process.c
         */
   
         mainParams = params;
+        mainParams.outputFolder = outputFolder;
   
         params.logger.info('start franklin import page');
     
         const u = new URL(params.url);
         const [path, filename] = buildPathAndFilenameWithPathFromUrl(params.url, '', 'docx');
-        const pageLocalFolder = pUtils.join(params.outputFolder, 'docx', path);
-        if (!fs.existsSync(pageLocalFolder)){
-          fs.mkdirSync(pageLocalFolder, { recursive: true });
+        const docxLocalFolder = pUtils.join(outputFolder, 'docx', path);
+        if (!fs.existsSync(docxLocalFolder)){
+          fs.mkdirSync(docxLocalFolder, { recursive: true });
         }
       
         /*
@@ -159,7 +160,7 @@ export function franklinImportPage({ importerSrcFolder, outputFolder = process.c
         */
     
         // start webserver to serve cached resources
-        var serve = serveStatic(params.outputFolder);
+        var serve = serveStatic(outputFolder);
         
         // Create server
         var server = http.createServer(function onRequest (req, res) {
@@ -209,9 +210,18 @@ export function franklinImportPage({ importerSrcFolder, outputFolder = process.c
   
         server.close();
       
-        fs.writeFileSync(pUtils.join(pageLocalFolder, filename), docs.docx);
+        fs.writeFileSync(pUtils.join(docxLocalFolder, filename), docs.docx);
       
-        params.logger.info(docs.md);
+        if (saveMD) {
+          const [path, filename] = buildPathAndFilenameWithPathFromUrl(params.url, '', 'md');
+          const mdLocalFolder = pUtils.join(outputFolder, 'md', path);
+          if (!fs.existsSync(mdLocalFolder)){
+            fs.mkdirSync(mdLocalFolder, { recursive: true });
+          }
+          fs.writeFileSync(pUtils.join(mdLocalFolder, filename), docs.md);
+        }
+
+        // params.logger.info(docs.md);
         
         params.logger.info('stop franklin import page');
       } catch(e) {
