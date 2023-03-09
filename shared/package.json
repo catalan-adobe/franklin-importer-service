@@ -8,6 +8,7 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
+    "prepare": "npm run build",
     "prestart": "npm run build",
     "start": "func start",
     "test": "echo \"No tests yet...\"",
@@ -31,10 +32,9 @@
   },
   "homepage": "https://github.com/catalan-adobe/franklin-importer-service#readme",
   "dependencies": {
-    "@types/node": "16.x",
+    "@types/node": "18.x",
     "chromium": "3.0.3",
-    "puppeteer-core": "19.7.2",
-    "parse-duration": "1.0.2"
+    "puppeteer-core": "19.7.3"
   },
   "devDependencies": {
     "@adobe/eslint-config-helix": "^2.0.2",
