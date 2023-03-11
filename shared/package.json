@@ -34,7 +34,7 @@
   "dependencies": {
     "@types/node": "18.x",
     "chromium": "3.0.3",
-    "puppeteer-core": "19.7.3"
+    "puppeteer-core": "19.7.4"
   },
   "devDependencies": {
     "@adobe/eslint-config-helix": "^2.0.2",
